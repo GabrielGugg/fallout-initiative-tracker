@@ -130,7 +130,7 @@ export class CreatureView extends ItemView {
             .setTooltip("Close Statblock")
             .onClick(async () => {
                 await this.render();
-                this.app.workspace.trigger("initiative-tracker:stop-viewing");
+                this.app.workspace.trigger("fallout-ttrpg:stop-viewing");
             });
     }
     onunload(): void {
@@ -138,7 +138,7 @@ export class CreatureView extends ItemView {
             this.bestiaryUnload();
             this.bestiaryUnload = null;
         }
-        this.app.workspace.trigger("initiative-tracker:stop-viewing");
+        this.app.workspace.trigger("fallout-ttrpg:stop-viewing");
     }
     getState(): Record<string, unknown> {
         return {

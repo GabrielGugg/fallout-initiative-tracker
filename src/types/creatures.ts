@@ -4,6 +4,7 @@ export interface CreatureState extends HomebrewCreature {
     currentMaxHP: number;
     currentHP: number;
     tempHP: number;
+    currentStamina?: number;
     currentAC: number | string;
     initiative: number;
     static: boolean;
@@ -30,6 +31,9 @@ export interface HomebrewCreature {
     name?: string;
     display?: string;
     hp?: number;
+    stamina?: number;
+    dt?: number;
+    ap?: number;
     ac?: number | string;
     stats?: number[];
     source?: string | string[];

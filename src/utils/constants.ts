@@ -2,9 +2,9 @@ import type { InitiativeTrackerData } from "src/settings/settings.types";
 import { Platform } from "obsidian";
 import { Conditions } from "./conditions";
 
-export const INITIATIVE_TRACKER_VIEW = "initiative-tracker-view";
-export const PLAYER_VIEW_VIEW = "initiative-tracker-player-view";
-export const CREATURE_TRACKER_VIEW = "initiative-tracker-creature-view";
+export const INITIATIVE_TRACKER_VIEW = "fallout-ttrpg-tracker-view";
+export const PLAYER_VIEW_VIEW = "fallout-ttrpg-player-view";
+export const CREATURE_TRACKER_VIEW = "fallout-ttrpg-creature-view";
 
 export const MIN_WIDTH_FOR_HAMBURGER = 300;
 
@@ -53,6 +53,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     },
     condense: false,
     clamp: true,
+    staminaOverflow: true,
     autoStatus: true,
     beginnerTips: true,
     displayDifficulty: true,

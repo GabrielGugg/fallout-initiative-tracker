@@ -1,10 +1,9 @@
 {
-    "id": "initiative-tracker",
-    "name": "Initiative Tracker",
-    "version": "13.0.21",
+    "id": "fallout-ttrpg",
+    "name": "Fallout TTRPG",
+    "version": "0.1.0",
     "minAppVersion": "1.7.2",
-    "author": "Jeremy Valentine",
-    "description": "TTRPG Initiative Tracker for Obsidian.md",
-    "authorUrl": "https://github.com/valentine195/obsidian-initiative-tracker",
+    "author": "Gabriel",
+    "description": "Ferramentas para o RPG de mesa de Fallout: rastreador de iniciativa com Estamina, Vida e Tolerância a Dano. Baseado no Initiative Tracker de Jeremy Valentine.",
     "isDesktopOnly": false
 }

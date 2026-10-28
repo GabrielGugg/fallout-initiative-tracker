@@ -33,6 +33,7 @@ export interface InitiativeTrackerData {
     encounters: { [key: string]: InitiativeViewState };
     condense: boolean;
     clamp: boolean;
+    staminaOverflow: boolean;
     hpOverflow: string;
     additiveTemp: boolean;
     autoStatus: boolean;

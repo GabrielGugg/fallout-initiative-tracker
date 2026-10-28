@@ -19,6 +19,10 @@ export class Creature {
     name: string;
     modifier: number | number[];
     hp: number;
+    stamina: number;
+    staminaMax: number;
+    dt: number;
+    ap: number;
     hit_dice?: string;
     rollHP?: boolean;
     temp: number;
@@ -88,6 +92,13 @@ export class Creature {
         this.marker = creature.marker;
 
         this.hp = this.max;
+        this.staminaMax = Math.max(
+            0,
+            Number((creature as any).staminaMax ?? creature.stamina) || 0
+        );
+        this.stamina = this.staminaMax;
+        this.dt = Math.max(0, Number(creature.dt) || 0);
+        this.ap = Math.max(0, Number(creature.ap) || 0);
         this.temp = 0;
         this.source = creature.source;
 
@@ -123,6 +134,15 @@ export class Creature {
                 <span ${tempMods}>${this.hp + this.temp}</span><span>/${
                 this.current_max
             }</span>
+            `;
+        }
+        return DEFAULT_UNDEFINED;
+    }
+
+    get staminaDisplay() {
+        if (this.staminaMax) {
+            return `
+                <span>${this.stamina}</span><span>/${this.staminaMax}</span>
             `;
         }
         return DEFAULT_UNDEFINED;
@@ -176,9 +196,17 @@ export class Creature {
     }
 
     static from(creature: HomebrewCreature | SRDMonster) {
+        // Campos do layout Fallout do Fantasy Statblocks:
+        // df = AC, td = DT, pe = Estamina, pv = HP, special[1] = Percepção
+        const raw = creature as any;
+        const perception = Array.isArray(raw.special)
+            ? Number(raw.special[1])
+            : NaN;
         const modifier =
             "modifier" in creature
                 ? creature.modifier
+                : !isNaN(perception)
+                ? perception
                 : Math.floor(
                       (("stats" in creature && creature.stats.length > 1
                           ? creature.stats[1]
@@ -188,7 +216,11 @@ export class Creature {
                   );
         return new Creature({
             ...creature,
-            modifier: modifier
+            modifier: modifier,
+            hp: raw.pv ?? creature.hp,
+            ac: raw.df ?? creature.ac,
+            stamina: raw.pe ?? creature.stamina,
+            dt: raw.td ?? creature.dt
         });
     }
 
@@ -201,6 +233,13 @@ export class Creature {
 
         if (this.hp > this.max) this.hp = this.max;
 
+        this.staminaMax = Math.max(
+            0,
+            Number((creature as any).staminaMax ?? creature.stamina) || 0
+        );
+        if (this.stamina > this.staminaMax) this.stamina = this.staminaMax;
+        this.dt = Math.max(0, Number(creature.dt) || 0);
+        this.ap = Math.max(0, Number(creature.ap) || 0);
         this.current_ac = this.ac = creature.ac ?? undefined;
         this.note = creature.note;
         this.level = creature.level;
@@ -223,6 +262,10 @@ export class Creature {
             static: this.static,
             modifier: this.modifier,
             hp: this.max,
+            stamina: this.staminaMax,
+            currentStamina: this.stamina,
+            dt: this.dt,
+            ap: this.ap,
             currentMaxHP: this.current_max,
             cr: this.cr,
             ac: this.ac,
@@ -262,6 +305,7 @@ export class Creature {
         creature.temp = state.tempHP ? state.tempHP : 0;
         creature.current_max = state.currentMaxHP;
         creature.hp = state.currentHP;
+        creature.stamina = state.currentStamina ?? creature.staminaMax;
         creature.current_ac = state.currentAC;
         let statuses: Condition[] = [];
         for (const status of state.status) {

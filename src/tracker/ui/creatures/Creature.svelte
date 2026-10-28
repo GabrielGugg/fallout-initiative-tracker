@@ -108,6 +108,22 @@
 </td>
 
 <td
+    class="center sp-container creature-adder"
+    class:mobile={Platform.isMobile}
+    aria-label="Stamina"
+    on:click|stopPropagation={(evt) => {
+        const prev = $updateTarget;
+        $updateTarget = "hp";
+        if (prev == "ac") return;
+        tracker.setUpdate(creature, evt);
+    }}
+>
+    <div>
+        {@html creature.staminaDisplay}
+    </div>
+</td>
+
+<td
     class="center hp-container creature-adder"
     class:mobile={Platform.isMobile}
     on:click|stopPropagation={(evt) => {
@@ -119,6 +135,26 @@
 >
     <div>
         {@html creature.hpDisplay}
+    </div>
+</td>
+
+<td
+    class="center dt-container"
+    class:mobile={Platform.isMobile}
+    aria-label="Damage Threshold"
+>
+    <div>
+        {creature.dt ? creature.dt : DEFAULT_UNDEFINED}
+    </div>
+</td>
+
+<td
+    class="center ap-container"
+    class:mobile={Platform.isMobile}
+    aria-label="Action Points"
+>
+    <div>
+        {creature.ap ? creature.ap : DEFAULT_UNDEFINED}
     </div>
 </td>
 

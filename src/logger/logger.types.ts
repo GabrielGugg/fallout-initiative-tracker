@@ -10,4 +10,8 @@ export interface UpdateLogMessage {
     unc: boolean;
     ac: string;
     ac_add: boolean;
+    /** Variação da Estamina (negativo = perdeu, positivo = recuperou). */
+    stamina?: number;
+    /** Dano bloqueado pela Tolerância a Dano. */
+    reduced?: number;
 }

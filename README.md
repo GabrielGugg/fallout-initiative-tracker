@@ -1,52 +1,67 @@
-> 🥇 Our documentation has moved ***[here](https://plugins.javalent.com/it)***.
->
-> <a href='https://www.buymeacoffee.com/valentine195' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
----
+# Fallout TTRPG (plugin do Obsidian)
 
-The Initiative Tracker plugin for **[Obsidian](https://obsidian.md)** allows you to keep track of initiative and turn order during combat encounters in tabletop role-playing games.
+Ferramentas para mesas do RPG de Fallout (sistema fan made) dentro do Obsidian.
 
-With this plugin, you can add creatures and NPCs to the initiative tracker, and track their health, armor class, and other stats. The plugin also calculates experience points for creatures, and supports both custom and SRD creatures from the **[Fantasy Statblocks](https://github.com/javalent/fantasy-statblocks)** plugin.
+Este plugin é um fork do [Initiative Tracker](https://github.com/valentine195/obsidian-initiative-tracker),
+de Jeremy Valentine, e mantém a licença **GPL-3.0** (veja `LICENSE`).
 
-## Features
-- Add and remove creatures from the encounter
-- Input creature name, HP, AC and initiative
-- Calculate creature XP based on level or challenge rating
-- Group identical creatures together to simplify the encounter
-- Set creature display names to differentiate identical creatures
-- Supports dice rolls to add random amount creatures
-- Keep track of creature HP, AC and status
-- Sort creatures by initiative automatically
-- Add several encounters in one code block
-- Automatically save and load encounters
-- And much, much more...
+## O que já mudou
 
-### Quickstart
+O rastreador de iniciativa agora conhece as regras de dano do sistema:
 
-- Install the Initiative Tracker plugin in Obsidian.
-- Open a note where you want to keep track of your encounter.
-- Create a code block with the language set to \`\`\`encounter.
+- **Estamina (SP)**: segunda barra de cada criatura. Se o alvo percebe a fonte do dano, o dano sai primeiro da Estamina.
+- **Vida (HP)**: com Estamina em 0, o dano vai para os HP.
+- **Tolerância a Dano (DT)**: reduz apenas o dano que chega aos HP; nunca fica abaixo de 0.
+- Criatura **inconsciente** (HP 0 ou condição de inconsciente) leva o dano direto nos HP.
 
-````yaml
-```encounter
-name: Example
-creatures:
- - 3: Goblin
+### Campo de dano (clique na célula de SP ou HP)
+
+| Digitar | Efeito |
+| --- | --- |
+| `12` | 12 de dano: Estamina primeiro, depois HP menos DT |
+| `-5` | cura 5 de HP |
+| `u12` | dano sem ciência da fonte: vai direto nos HP (a DT vale) |
+| `s5` | tira 5 de Estamina direto (sem DT) |
+| `s-5` | recupera 5 de Estamina |
+| `t5` / `m5` | HP temporário / HP máximo (como no original) |
+
+Os modificadores de "saved" e "resist" do original continuam valendo e são aplicados **antes** da DT.
+
+### Configuração
+
+Em *Settings → Fallout TTRPG*: **Excess damage carries over to HP**.
+Ligado (padrão): o que passa da Estamina restante continua para os HP, com a DT aplicada nesse excedente.
+Desligado: um golpe sofrido com Estamina acima de 0 é totalmente absorvido por ela.
+
+### Jogadores e criaturas
+
+- Formulário de criatura e de jogador: campos **Max Stamina** e **DT**.
+- Jogadores ligados a uma nota leem do frontmatter: `stamina` (máxima) e `dt`, além de `hp`, `ac`, `modifier`, `level`, `name`.
+- Criaturas vindas de statblocks usam os campos `stamina` e `dt` quando existirem.
+
+## Como compilar e instalar
+
+Precisa do [Node.js](https://nodejs.org/) (versão 18 ou mais nova).
+
+```bash
+npm install
+npm run build
 ```
-````
 
-- Add creatures to the encounter by name, dice roll or bestiary entry.
-- Launch the encounter by clicking on the play button, and start tracking initiative.
+Isso gera `main.js` e `styles.css` na raiz. Copie `main.js`, `manifest.json` e `styles.css` para:
 
-Check out the **[plugin documentation](https://plugins.javalent.com/it)** for more detailed instructions and examples.
+```
+<seu vault>/.obsidian/plugins/fallout-ttrpg/
+```
 
-## Support
+Depois ative **Fallout TTRPG** em *Settings → Community plugins*.
 
-If you encounter any issues, want to give back and help out, or have suggestions for new features, file an issue on the **[GitHub repository](https://github.com/valentine195/obsidian-initiative-tracker/issues)**.
+> O plugin original (Initiative Tracker) registra os mesmos blocos de código (`encounter`, etc.).
+> Desative o original enquanto usar este para evitar conflito. Os dados (`data.json`) ficam separados.
 
-### TTRPG plugins
+## Ideias para as próximas etapas
 
-If you're using Obsidian to run/plan a TTRPG, you may find my other plugins useful:
-
-- **[Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin)** Adds interactive maps to Obsidian notes
-- **[Dice Roller](https://github.com/valentine195/obsidian-dice-roller)** Inline dice rolling for Obsidian
-- **[Fantasy Statblocks](https://github.com/valentine195/obsidian-5e-statblocks)** Format Statblocks inside Obsidian
+- Tradução da interface para português.
+- Estamina no painel do jogador e nos blocos `encounter`.
+- Recuperação de Estamina por rodada, se a regra existir na sua mesa.
+- Outras funções do sistema (testes de perícia, itens, etc.) além da iniciativa.

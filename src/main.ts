@@ -145,11 +145,11 @@ export default class InitiativeTracker extends Plugin {
     unregisterCommandsFor(encounter: string) {
         if (
             this.app.commands.findCommand(
-                `initiative-tracker:start-${encounter}`
+                `fallout-ttrpg:start-${encounter}`
             )
         ) {
             delete this.app.commands.commands[
-                `initiative-tracker:start-${encounter}`
+                `fallout-ttrpg:start-${encounter}`
             ];
         }
     }
@@ -426,9 +426,12 @@ export default class InitiativeTracker extends Plugin {
                         this.app.metadataCache.getFileCache(file)?.frontmatter;
                     if (!frontmatter) return;
                     for (let player of players) {
-                        const { ac, hp, modifier, level, name } = frontmatter;
+                        const { ac, hp, modifier, level, name, stamina, dt } =
+                            frontmatter;
                         player.ac = ac;
                         player.hp = hp;
+                        player.stamina = stamina;
+                        player.dt = dt;
                         player.modifier = modifier;
                         player.level = level;
                         player.name = name ? name : player.name;
@@ -448,6 +451,8 @@ export default class InitiativeTracker extends Plugin {
                                     creature,
                                     change: {
                                         set_max_hp: player.hp,
+                                        set_max_stamina: player.stamina,
+                                        dt: player.dt,
                                         ac: player.ac
                                     }
                                 });
@@ -563,13 +568,13 @@ export default class InitiativeTracker extends Plugin {
     addEvents() {
         this.registerEvent(
             this.app.workspace.on(
-                "initiative-tracker:should-save",
+                "fallout-ttrpg:should-save",
                 async () => await this.saveSettings()
             )
         );
         this.registerEvent(
             this.app.workspace.on(
-                "initiative-tracker:save-state",
+                "fallout-ttrpg:save-state",
                 async (state: InitiativeViewState) => {
                     this.data.state = state;
                     await this.saveSettings();
@@ -578,7 +583,7 @@ export default class InitiativeTracker extends Plugin {
         );
         this.registerEvent(
             this.app.workspace.on(
-                "initiative-tracker:start-encounter",
+                "fallout-ttrpg:start-encounter",
                 async (homebrews: HomebrewCreature[]) => {
                     try {
                         const creatures = homebrews.map((h) =>
@@ -625,7 +630,7 @@ export default class InitiativeTracker extends Plugin {
         this.app.workspace.detachLeavesOfType(CREATURE_TRACKER_VIEW);
         this.app.workspace.detachLeavesOfType(BUILDER_VIEW);
 
-        this.app.workspace.trigger("initiative-tracker:unloaded");
+        this.app.workspace.trigger("fallout-ttrpg:unloaded");
         console.log("Initiative Tracker unloaded");
     }
 

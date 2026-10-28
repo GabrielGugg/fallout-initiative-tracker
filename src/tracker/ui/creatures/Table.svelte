@@ -28,6 +28,15 @@
     const acIcon = (node: HTMLElement) => {
         setIcon(node, AC);
     };
+    const spIcon = (node: HTMLElement) => {
+        setIcon(node, "zap");
+    };
+    const dtIcon = (node: HTMLElement) => {
+        setIcon(node, "brick-wall");
+    };
+    const apIcon = (node: HTMLElement) => {
+        setIcon(node, "hourglass");
+    };
     const flipDurationMs = 300;
     function handleDndConsider(
         e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }[]>>
@@ -69,14 +78,17 @@
     {#if $ordered.length}
         <thead class="tracker-table-header">
             <td
-                style="width: 10%;"
+                 style="width: 7%;"
                 use:diceIcon
                 aria-label="Re-Roll Initiatives"
                 on:click={(evt) => tracker.roll(plugin)}
             />
-            <th class="left" style="width:55%">Name</th>
-            <th style="width:15%" use:hpIcon class="center" />
-            <th style="width:15%" use:acIcon class="center" />
+            <th class="left" style="width:28%">Name</th>
+            <th style="width:14%" use:spIcon class="center" aria-label="Stamina" />
+            <th style="width:14%" use:hpIcon class="center" />
+            <th style="width:7%" use:dtIcon class="center" aria-label="Damage Threshold" />
+            <th style="width:7%" use:apIcon class="center" aria-label="Action Points" />
+            <th style="width:7%" use:acIcon class="center" />
             <th style="width:5%" />
         </thead>
         <tbody

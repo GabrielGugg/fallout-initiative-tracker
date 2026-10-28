@@ -206,6 +206,19 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 });
             });
         new Setting(additionalContainer)
+            .setName("Excess damage carries over to HP")
+            .setDesc(
+                "When damage is greater than the remaining Stamina, the excess continues on to HP (and DT is applied to that excess). Off: a hit taken while Stamina is above 0 is fully absorbed by Stamina."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.staminaOverflow ?? true).onChange(
+                    async (v) => {
+                        this.plugin.data.staminaOverflow = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
+            });
+        new Setting(additionalContainer)
             .setName("Overflow Healing")
             .setDesc(
                 "Set what happens to healing which goes above creatures' max HP threshold."
@@ -1086,11 +1099,16 @@ class NewPlayerModal extends Modal {
                     this.player.name = file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
-                    const { ac, hp, modifier, level, name } =
+                    const { ac, hp, modifier, level, name, stamina, dt } =
                         metaData.frontmatter;
                     this.player.name = name ?? this.player.name;
                     this.player.ac = parseInt(ac ?? this.player.ac, 10);
                     this.player.hp = parseInt(hp ?? this.player.hp, 10);
+                    this.player.stamina = parseInt(
+                        stamina ?? this.player.stamina,
+                        10
+                    );
+                    this.player.dt = parseInt(dt ?? this.player.dt, 10);
                     this.player.level = parseInt(
                         level ?? this.player.level,
                         10
@@ -1172,6 +1190,18 @@ class NewPlayerModal extends Modal {
             t.onChange((v) => {
                 t.inputEl.removeClass("has-error");
                 this.player.hp = Number(v);
+            });
+        });
+        new Setting(contentEl).setName("Max Stamina").addText((t) => {
+            t.setValue(`${this.player.stamina ?? ""}`);
+            t.onChange((v) => {
+                this.player.stamina = Number(v);
+            });
+        });
+        new Setting(contentEl).setName("Damage Threshold (DT)").addText((t) => {
+            t.setValue(`${this.player.dt ?? ""}`);
+            t.onChange((v) => {
+                this.player.dt = Number(v);
             });
         });
         new Setting(contentEl).setName("Armor Class").addText((t) => {

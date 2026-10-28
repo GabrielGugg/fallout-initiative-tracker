@@ -129,6 +129,36 @@
             />
         </div>
         <div>
+            <label for="add-stamina">Max Stamina</label>
+            <input
+                bind:value={creature.staminaMax}
+                id="add-stamina"
+                type="number"
+                name="stamina"
+                tabindex="0"
+            />
+        </div>
+        <div>
+            <label for="add-dt">DT</label>
+            <input
+                bind:value={creature.dt}
+                id="add-dt"
+                type="number"
+                name="dt"
+                tabindex="0"
+            />
+        </div>
+        <div>
+            <label for="add-ap">AP</label>
+            <input
+                bind:value={creature.ap}
+                id="add-ap"
+                type="number"
+                name="ap"
+                tabindex="0"
+            />
+        </div>
+        <div>
             <label for="add-ac">AC</label>
             <input
                 bind:value={creature.ac}

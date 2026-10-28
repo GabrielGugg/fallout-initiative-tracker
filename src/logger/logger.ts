@@ -142,7 +142,33 @@ export default class Logger {
         const toLog: string[] = [];
         for (const message of messages) {
             const perCreature: string[] = [];
-            if (message.hp) {
+            if (
+                !message.temp &&
+                !message.max &&
+                (message.stamina || message.reduced)
+            ) {
+                if (message.stamina && message.stamina > 0) {
+                    perCreature.push(
+                        `${message.name} recovered ${message.stamina} Stamina`
+                    );
+                } else {
+                    const parts: string[] = [];
+                    if (message.stamina) {
+                        parts.push(`${-message.stamina} Stamina`);
+                    }
+                    if (message.hp && message.hp < 0) {
+                        parts.push(`${-message.hp} HP`);
+                    }
+                    if (message.reduced) {
+                        parts.push(`DT blocked ${message.reduced}`);
+                    }
+                    perCreature.push(
+                        `${message.name} took damage (${parts.join(", ")})${
+                            message.unc ? " and was knocked unconscious" : ""
+                        }`
+                    );
+                }
+            } else if (message.hp) {
                 if (message.temp) {
                     perCreature.push(
                         `${message.name} gained ${(

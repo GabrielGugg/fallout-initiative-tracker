@@ -1,15 +1,15 @@
 {
-    "name": "@javalent/initiative-tracker",
-    "version": "13.0.21",
-    "description": "TTRPG Initiative Tracker for Obsidian.md",
+    "name": "fallout-ttrpg",
+    "version": "0.1.0",
+    "description": "Fallout TTRPG tools for Obsidian, based on Initiative Tracker",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "build": "node esbuild.config.mjs production && tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap --outdir ./dist",
+        "build": "node esbuild.config.mjs production && tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap --outdir \"G:/Meu Drive/RPG/Fallout TTRPG 2.0/Mestre/Vault-Texas/Vault-texas/.obsidian/plugins/fallout-ttrpg\"",
         "dev": "node esbuild.config.mjs"
     },
     "keywords": [],
     "author": "",
-    "license": "MIT",
+    "license": "GPL-3.0",
     "devDependencies": {
         "@codemirror/commands": "^6.2.5",
         "@codemirror/lang-javascript": "^6.2.1",

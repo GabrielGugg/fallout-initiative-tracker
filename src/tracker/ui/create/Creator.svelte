@@ -37,6 +37,10 @@
                     if ($editing.hp != creature.max) {
                         creature.max = creature.current_max = $editing.hp;
                     }
+                    creature.stamina = Math.min(
+                        creature.stamina,
+                        Math.max(0, Number(creature.staminaMax) || 0)
+                    );
                     if (creature.dirty_ac) {
                         creature.current_ac = $editing.ac;
                         creature.dirty_ac = false;

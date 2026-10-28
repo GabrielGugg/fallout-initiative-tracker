@@ -7,34 +7,34 @@ import { Creature } from "src/utils/creature";
 declare module "obsidian" {
     interface Workspace {
         on(
-            name: "initiative-tracker:should-save",
+            name: "fallout-ttrpg:should-save",
             callback: () => void
         ): EventRef;
-        trigger(name: "initiative-tracker:should-save"): void;
+        trigger(name: "fallout-ttrpg:should-save"): void;
         on(
-            name: "initiative-tracker:save-state",
+            name: "fallout-ttrpg:save-state",
             callback: (state?: InitiativeViewState) => void
         ): EventRef;
         trigger(
-            name: "initiative-tracker:save-state",
+            name: "fallout-ttrpg:save-state",
             state?: InitiativeViewState
         ): void;
         /** This event can be used to start an event by sending an object with a name, HP, AC, and initiative modifier at minimum. */
         on(
-            name: "initiative-tracker:start-encounter",
+            name: "fallout-ttrpg:start-encounter",
             callback: (creatures: HomebrewCreature[]) => void
         ): EventRef;
         trigger(
-            name: "initiative-tracker:start-encounter",
+            name: "fallout-ttrpg:start-encounter",
             creatures: HomebrewCreature[]
         ): void;
         on(
-            name: "initiative-tracker:stop-viewing",
+            name: "fallout-ttrpg:stop-viewing",
             callback: (creatures: HomebrewCreature[]) => void
         ): EventRef;
-        trigger(name: "initiative-tracker:stop-viewing"): void;
-        on(name: "initiative-tracker:unloaded", callback: () => void): EventRef;
-        trigger(name: "initiative-tracker:unloaded"): void;
+        trigger(name: "fallout-ttrpg:stop-viewing"): void;
+        on(name: "fallout-ttrpg:unloaded", callback: () => void): EventRef;
+        trigger(name: "fallout-ttrpg:unloaded"): void;
     }
 }
 

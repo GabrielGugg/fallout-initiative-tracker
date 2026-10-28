@@ -21,6 +21,8 @@ interface CreatureStats {
     name: string;
     ac: number | string;
     hp: number;
+    stamina?: number;
+    dt?: number;
     modifier: number | number[];
     xp: number;
     display?: string;
@@ -30,6 +32,9 @@ interface CreatureStats {
     rollHP?: boolean;
 }
 
+const maxStamina = (creature: Creature | CreatureStats): number =>
+    ("staminaMax" in creature ? creature.staminaMax : creature.stamina) ?? 0;
+
 export const equivalent = (
     creature: Creature | CreatureStats,
     existing: Creature | CreatureStats
@@ -38,6 +43,8 @@ export const equivalent = (
         creature.name == existing.name &&
         creature.display == existing.display &&
         creature.ac == existing.ac &&
+        maxStamina(creature) == maxStamina(existing) &&
+        (creature.dt ?? 0) == (existing.dt ?? 0) &&
         equivalentModifiers(creature.modifier, existing.modifier) &&
         creature.xp == existing.xp &&
         creature.hidden == existing.hidden &&

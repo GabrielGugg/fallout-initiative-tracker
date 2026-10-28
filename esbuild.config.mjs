@@ -15,7 +15,9 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = process.argv[2] === "production";
 
-const dir = prod ? "./" : process.env.OUTDIR;
+const dir = prod
+    ? "G:/Meu Drive/RPG/Fallout TTRPG 2.0/Mestre/Vault-Texas/Vault-texas/.obsidian/plugins/fallout-ttrpg"
+    : process.env.OUTDIR;
 
 const parameters = {
     banner: {
