@@ -890,6 +890,16 @@ function createTracker() {
                 }
                 return creatures;
             }),
+            clear: () => {
+                setState(false);
+                if (_logger) {
+                    _logger.logging = false;
+                }
+                $logFile.set(null);
+                $round.set(1);
+                $name.set(null);
+                updateAndSave(() => []);
+            },
         reset: () =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {

@@ -220,7 +220,8 @@ export class Creature {
             hp: raw.pv ?? creature.hp,
             ac: raw.df ?? creature.ac,
             stamina: raw.pe ?? creature.stamina,
-            dt: raw.td ?? creature.dt
+            dt: raw.td ?? creature.dt,
+            ap: raw.pa ?? raw.ap ?? creature.ap
         });
     }
 

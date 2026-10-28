@@ -154,7 +154,7 @@
     aria-label="Action Points"
 >
     <div>
-        {creature.ap ? creature.ap : DEFAULT_UNDEFINED}
+        {creature.ap ?? DEFAULT_UNDEFINED}
     </div>
 </td>
 

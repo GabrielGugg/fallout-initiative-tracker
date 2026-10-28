@@ -63,6 +63,11 @@
                 .onClick(() => tracker.new(plugin));
         });
         menu.addItem((item) => {
+            item.setIcon("trash-2")
+                .setTitle("Clear Encounter")
+                .onClick(() => tracker.clear());
+        });
+        menu.addItem((item) => {
             item.setIcon(NEW)
                 .setTitle("Add Creatures")
                 .onClick(() => dispatch("add-creatures"));
@@ -247,42 +252,14 @@
         }
 
         menu.addSeparator();
-        if (!Platform.isMobile) {
-            menu.addItem((item) => {
-                const load = item
-                    .setIcon("open-elsewhere-glyph")
-                    .setTitle("Load Encounter")
-                    .setDisabled(
-                        Object.keys(plugin.data.encounters).length == 0
-                    )
-                    .setSubmenu()
-                    .setNoIcon();
-
-                for (const encounter of Object.keys(plugin.data.encounters)) {
-                    load.addItem((item) => {
-                        item.setTitle(encounter).onClick(() => {
-                            tracker.new(
-                                plugin,
-                                plugin.data.encounters[encounter]
-                            );
-                        });
-                    });
-                }
-            });
-        } else {
-            menu.addItem((item) => {
-                item.setIcon("open-elsewhere-glyph")
-                    .setTitle("Load Encounter")
-                    .setIsLabel(true);
-            });
-            for (const encounter of Object.keys(plugin.data.encounters)) {
-                menu.addItem((item) => {
-                    item.setTitle(encounter).onClick(() => {
-                        tracker.new(plugin, plugin.data.encounters[encounter]);
-                    });
-                });
-            }
-        }
+        menu.addItem((item) => {
+            item.setIcon("folder-open")
+                .setTitle("Load Encounter")
+                .setDisabled(
+                    Object.keys(plugin.data.encounters).length === 0
+                )
+                .onClick(() => dispatch("load"));
+        });
         menu.addItem((item) => {
             item.setIcon(SAVE)
                 .setTitle("Save Encounter")

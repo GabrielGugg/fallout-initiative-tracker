@@ -1099,7 +1099,7 @@ class NewPlayerModal extends Modal {
                     this.player.name = file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
-                    const { ac, hp, modifier, level, name, stamina, dt } =
+                    const { ac, hp, modifier, level, name, stamina, dt, ap } =
                         metaData.frontmatter;
                     this.player.name = name ?? this.player.name;
                     this.player.ac = parseInt(ac ?? this.player.ac, 10);
@@ -1109,6 +1109,7 @@ class NewPlayerModal extends Modal {
                         10
                     );
                     this.player.dt = parseInt(dt ?? this.player.dt, 10);
+                    this.player.ap = Number(ap ?? this.player.ap ?? 10);
                     this.player.level = parseInt(
                         level ?? this.player.level,
                         10
