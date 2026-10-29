@@ -16,6 +16,8 @@ export interface EncounterParameters {
     creatures?: RawCreatureArray;
     xp?: number;
     rollHP?: boolean;
+    /** Name of a saved encounter; the block renders a link that loads it into the tracker. */
+    load?: string;
 }
 interface CreatureStats {
     name: string;
@@ -390,6 +392,14 @@ export class EncounterBlock extends MarkdownRenderChild {
             if (!encounter?.trim().length) continue;
             try {
                 const params: EncounterParameters = parseYaml(encounter);
+                if (typeof params?.load === "string") {
+                    this.renderLoadLink(
+                        params.load,
+                        containerEl.createDiv("encounter-instance")
+                    );
+                    empty.detach();
+                    continue;
+                }
                 new EncounterComponent(
                     await this.parser.parse(params),
                     containerEl.createDiv("encounter-instance"),
@@ -410,6 +420,53 @@ export class EncounterBlock extends MarkdownRenderChild {
                 text: `\`\`\`encounter\n${this.src}\`\`\``
             });
         });
+    }
+    renderLoadLink(name: string, el: HTMLElement) {
+        const wanted = name.trim();
+        const encounters = this.plugin.data.encounters;
+        // exact match first, then case-insensitive
+        const key =
+            wanted in encounters
+                ? wanted
+                : Object.keys(encounters).find(
+                      (k) => k.toLowerCase() === wanted.toLowerCase()
+                  );
+
+        if (!key) {
+            el.createSpan({
+                cls: "initiative-tracker-warning",
+                text: `Saved encounter "${wanted}" not found.`
+            });
+            return;
+        }
+
+        const link = el.createEl("a", {
+            text: key,
+            href: "#",
+            cls: "encounter-load-link",
+            attr: { "aria-label": "Load encounter in the tracker" }
+        });
+        link.onclick = async (evt) => {
+            evt.preventDefault();
+            try {
+                if (!this.plugin.view) await this.plugin.addTrackerView();
+                // read at click time to get the latest saved version
+                const saved = this.plugin.data.encounters[key];
+                if (!saved) {
+                    new Notice(`Saved encounter "${key}" no longer exists.`);
+                    return;
+                }
+                this.plugin.tracker.new(this.plugin, saved);
+                const view = this.plugin.view;
+                if (view) this.plugin.app.workspace.revealLeaf(view.leaf);
+            } catch (e) {
+                console.error(e);
+                new Notice(
+                    "There was an issue loading the encounter.\n\n" +
+                        (e as Error).message
+                );
+            }
+        };
     }
     async postprocessTable() {
         const encounterSource = this.src.split("---") ?? [];

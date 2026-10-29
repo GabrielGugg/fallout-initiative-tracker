@@ -290,3 +290,7 @@ body {
         transform: /* scale(1) */ rotate(660deg);
     }
 }
+.encounter-load-link {
+    cursor: pointer;
+    font-weight: var(--font-semibold);
+}

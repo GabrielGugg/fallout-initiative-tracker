@@ -15,6 +15,7 @@ enum SuggestContext {
     Party,
     RollHP,
     Name,
+    Load,
     None
 }
 
@@ -23,6 +24,7 @@ interface ParsedEncounter {
     players?: string[];
     party?: string;
     rollHP?: boolean;
+    load?: string;
     creatures?: Array<{ [key: number]: string } | string>;
 }
 
@@ -57,20 +59,27 @@ export class EncounterSuggester extends EditorSuggest<string> {
             case SuggestContext.RollHP:
                 suggestions = ["true", "false"];
                 break;
+            case SuggestContext.Load:
+                suggestions = Object.keys(this.plugin.data.encounters ?? {});
+                break;
             case SuggestContext.None:
                 suggestions = [
                     "players",
                     "creatures",
                     "party",
                     "rollHP",
-                    "name"
+                    "name",
+                    "load"
                 ].filter((k) => !(k in this._encounter));
                 break;
         }
+        const query =
+            this._context === SuggestContext.Load
+                ? ctx.query.replace(/^"|"$/g, "")
+                : ctx.query;
         return suggestions.filter(
             (s) =>
-                !ctx.query.length ||
-                s.toLowerCase().contains(ctx.query.toLowerCase())
+                !query.length || s.toLowerCase().contains(query.toLowerCase())
         );
     }
     renderSuggestion(text: string, el: HTMLElement) {
@@ -102,6 +111,13 @@ export class EncounterSuggester extends EditorSuggest<string> {
                     this.context.editor.getLine(this.context.start.line)
                 );
                 value = `${endsWithSpace ? "" : " "}${value.trim()}`;
+                break;
+            }
+            case SuggestContext.Load: {
+                const endsWithSpace = /\s$/.test(
+                    this.context.editor.getLine(this.context.start.line)
+                );
+                value = `${endsWithSpace ? "" : " "}"${value.trim()}"`;
                 break;
             }
             case SuggestContext.Name:
@@ -180,6 +196,20 @@ export class EncounterSuggester extends EditorSuggest<string> {
                     line: cursor.line
                 },
                 query
+            };
+        }
+        if (/^load:/.test(line)) {
+            this._context = SuggestContext.Load;
+            const [_, rawQuery] = line.match(/^load:\s?(.*)$/);
+            const query = rawQuery.replace(/^"|"$/g, "");
+            if (query in (this.plugin.data.encounters ?? {})) return null;
+            return {
+                end: cursor,
+                start: {
+                    ch: line.length - rawQuery.length,
+                    line: cursor.line
+                },
+                query: rawQuery
             };
         }
         if (/^party:/.test(line)) {
