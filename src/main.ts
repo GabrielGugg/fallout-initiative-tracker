@@ -23,7 +23,11 @@ import type { InitiativeViewState } from "./tracker/view.types";
 import type { HomebrewCreature } from "./types/creatures";
 import type { SRDMonster } from "./types/creatures";
 import InitiativeTrackerSettings from "./settings/settings";
-import { EncounterBlock, EncounterParser } from "./encounter";
+import {
+    EncounterBlock,
+    EncounterParser,
+    renderSavedEncounterLink
+} from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
 import { Creature, getId } from "./utils/creature";
 import TrackerView, { CreatureView } from "./tracker/view";
@@ -310,6 +314,25 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         );
+
+        // inline form: `encounter-load: Saved Encounter Name` -> just a hyperlink
+        this.registerMarkdownPostProcessor((el) => {
+            if (!el || !el.firstElementChild) return;
+            const loadCodes = Array.from(
+                el.querySelectorAll<HTMLElement>("code")
+            ).filter((code) => /^encounter-load:\s/.test(code.innerText));
+            for (const code of loadCodes) {
+                const target = createSpan("initiative-tracker-encounter-load");
+                code.replaceWith(target);
+                renderSavedEncounterLink(
+                    this,
+                    code.innerText
+                        .replace(/^encounter-load:\s*/, "")
+                        .replace(/^(["'])(.*)\1$/, "$2"),
+                    target
+                );
+            }
+        });
 
         this.registerMarkdownPostProcessor(async (el, ctx) => {
             if (!el || !el.firstElementChild) return;

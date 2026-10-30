@@ -294,3 +294,16 @@ body {
     cursor: pointer;
     font-weight: var(--font-semibold);
 }
+
+.encounter-load-preview {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    padding: 0.5rem 0.75rem;
+}
+.encounter-load-title {
+    font-size: var(--font-ui-medium);
+    margin-bottom: 0.25rem;
+}
+.encounter-load-section ul {
+    margin: 0.15rem 0 0.4rem;
+}

@@ -362,6 +362,137 @@ class EncounterComponent {
     }
 }
 
+/** Finds a saved encounter key by exact name, then case-insensitively. */
+export function findSavedEncounterKey(
+    plugin: InitiativeTracker,
+    name: string
+): string | undefined {
+    const wanted = name.trim();
+    const encounters = plugin.data.encounters ?? {};
+    return wanted in encounters
+        ? wanted
+        : Object.keys(encounters).find(
+              (k) => k.toLowerCase() === wanted.toLowerCase()
+          );
+}
+
+/** Loads a saved encounter into the tracker, opening the tracker view if needed. */
+export async function loadSavedEncounter(
+    plugin: InitiativeTracker,
+    key: string
+) {
+    try {
+        if (!plugin.view) await plugin.addTrackerView();
+        // read at click time to get the latest saved version
+        const saved = plugin.data.encounters[key];
+        if (!saved) {
+            new Notice(`Saved encounter "${key}" no longer exists.`);
+            return;
+        }
+        plugin.tracker.new(plugin, saved);
+        const view = plugin.view;
+        if (view) plugin.app.workspace.revealLeaf(view.leaf);
+    } catch (e) {
+        console.error(e);
+        new Notice(
+            "There was an issue loading the encounter.\n\n" +
+                (e as Error).message
+        );
+    }
+}
+
+function createLoadLink(
+    plugin: InitiativeTracker,
+    key: string,
+    parent: HTMLElement
+) {
+    const link = parent.createEl("a", {
+        text: key,
+        href: "#",
+        cls: "encounter-load-link",
+        attr: { "aria-label": "Load encounter in the tracker" }
+    });
+    link.onclick = (evt) => {
+        evt.preventDefault();
+        loadSavedEncounter(plugin, key);
+    };
+    return link;
+}
+
+/** Inline form: only a hyperlink that loads the saved encounter. */
+export function renderSavedEncounterLink(
+    plugin: InitiativeTracker,
+    name: string,
+    el: HTMLElement
+) {
+    const key = findSavedEncounterKey(plugin, name);
+    if (!key) {
+        el.createSpan({
+            cls: "initiative-tracker-warning",
+            text: `Saved encounter "${name.trim()}" not found.`
+        });
+        return;
+    }
+    createLoadLink(plugin, key, el);
+}
+
+/** Block form: link plus the players and creatures stored in the saved encounter. */
+export function renderSavedEncounterPreview(
+    plugin: InitiativeTracker,
+    name: string,
+    el: HTMLElement
+) {
+    const key = findSavedEncounterKey(plugin, name);
+    if (!key) {
+        el.createSpan({
+            cls: "initiative-tracker-warning",
+            text: `Saved encounter "${name.trim()}" not found.`
+        });
+        return;
+    }
+    const saved = plugin.data.encounters[key];
+    const box = el.createDiv("encounter-load-preview");
+    createLoadLink(plugin, key, box.createDiv("encounter-load-title"));
+
+    const group = (list: typeof saved.creatures) => {
+        const grouped = new Map<string, { count: number; c: any }>();
+        for (const c of list) {
+            const label = c.display ?? c.name;
+            const id = `${label}|${c.ac}|${c.hp}`;
+            const existing = grouped.get(id);
+            if (existing) existing.count++;
+            else grouped.set(id, { count: 1, c });
+        }
+        return [...grouped.values()];
+    };
+    const section = (title: string, list: typeof saved.creatures) => {
+        if (!list.length) return;
+        const sec = box.createDiv("encounter-load-section");
+        sec.createEl("strong", { text: title });
+        const ul = sec.createEl("ul");
+        for (const { count, c } of group(list)) {
+            const stats = [
+                c.hp != null ? `HP ${c.hp}` : null,
+                c.ac != null ? `AC ${c.ac}` : null
+            ].filter((v) => v);
+            ul.createEl("li", {
+                text: `${count > 1 ? `${count}× ` : ""}${c.display ?? c.name}${
+                    stats.length ? ` (${stats.join(", ")})` : ""
+                }`
+            });
+        }
+    };
+    const creatures = saved.creatures ?? [];
+    section(
+        "Jogadores",
+        creatures.filter((c) => c.player)
+    );
+    section(
+        "Criaturas",
+        creatures.filter((c) => !c.player)
+    );
+}
+
 export class EncounterBlock extends MarkdownRenderChild {
     parser: EncounterParser;
     constructor(
@@ -422,51 +553,7 @@ export class EncounterBlock extends MarkdownRenderChild {
         });
     }
     renderLoadLink(name: string, el: HTMLElement) {
-        const wanted = name.trim();
-        const encounters = this.plugin.data.encounters;
-        // exact match first, then case-insensitive
-        const key =
-            wanted in encounters
-                ? wanted
-                : Object.keys(encounters).find(
-                      (k) => k.toLowerCase() === wanted.toLowerCase()
-                  );
-
-        if (!key) {
-            el.createSpan({
-                cls: "initiative-tracker-warning",
-                text: `Saved encounter "${wanted}" not found.`
-            });
-            return;
-        }
-
-        const link = el.createEl("a", {
-            text: key,
-            href: "#",
-            cls: "encounter-load-link",
-            attr: { "aria-label": "Load encounter in the tracker" }
-        });
-        link.onclick = async (evt) => {
-            evt.preventDefault();
-            try {
-                if (!this.plugin.view) await this.plugin.addTrackerView();
-                // read at click time to get the latest saved version
-                const saved = this.plugin.data.encounters[key];
-                if (!saved) {
-                    new Notice(`Saved encounter "${key}" no longer exists.`);
-                    return;
-                }
-                this.plugin.tracker.new(this.plugin, saved);
-                const view = this.plugin.view;
-                if (view) this.plugin.app.workspace.revealLeaf(view.leaf);
-            } catch (e) {
-                console.error(e);
-                new Notice(
-                    "There was an issue loading the encounter.\n\n" +
-                        (e as Error).message
-                );
-            }
-        };
+        renderSavedEncounterPreview(this.plugin, name, el);
     }
     async postprocessTable() {
         const encounterSource = this.src.split("---") ?? [];
